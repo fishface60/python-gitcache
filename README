@@ -1,0 +1,27 @@
+# python-gitcache
+
+## Fast temporary clones
+
+--shared is safe to use on a different filesystem.
+Mechanism only safe if you can guarantee that the parent repo isn't gc'd.
+Can assure this by taking a lock for the lifetime of the temporary repo.
+
+
+## Why not `git clone --local` for fast local clones
+
+Want to use in chroot.
+
+git clone --local will copy .git/objects/info/alternates config from original,
+--local won't help there.
+
+--shared is faster when temporary is ok and both can have alternates references.
+
+This is a separate problem
+
+## How does this compare to git working trees?
+
+Git working-trees are a neat, rather new feature.
+Adding a new working tree is faster than re-cloning,
+but its primary purpose is to let you use the same repository
+in new and interesting ways without touching your old working tree,
+rather than letting you quickly have multiple independent copies.

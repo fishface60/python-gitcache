@@ -1,0 +1,23 @@
+Features:
+1.  Fine-grained ref locking, so you can safely run with autogc.
+    Use namespaces to separate anchor refs from cloneable refs.
+    Batch ref update into per-operation namespaces?
+2.  Use shallow fetches
+3.  Separate library for making a git repository chroot safe
+4.  Smarter variant that keeps everything in the same git repo,
+    with namespaces for each repository
+5.  Remote variant that connects to a proxy daemon to take locks,
+    request updates, query resolve-tree, ls-tree, cat-file, and
+    clones from a git server served from the cache.
+6.  Chainable variant
+
+Bugfixes:
+
+1.  If something tries to get_repo while it's being deleted,
+    it will interpret the exclusive lock as it being set up,
+    and assume it can use it after it gets the shared lock.
+    It needs to detect that it was removed and retry.
+
+Cleanup:
+1.  Rationalise lock timeouts to config
+2.  Define nice exception classes

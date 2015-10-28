@@ -1,0 +1,40 @@
+1.  Resolving commits to trees when you have:
+    a repo url pointing to where the repository at least was at some point
+    a committish (tag or commit ideally, but may be any gitrevision)
+    a best guess as to a ref that the tree might be in.
+    If you have the repo and the committish is a fixed point:
+      Check whether that committish already exists in your cached repo.
+      Potentially: Check if any other repos have it?
+      If not found, move on.
+    TODO: Some program which speaks a subset of the git protocol to ask
+          for just the commit and trees, aborting before transferring blobs?
+    Freshly clone, or update a clone attempting:
+    1.  A shallow fetch requesting just the requested commits,
+        if the server has been configured to allow that.
+    2.  A ls-remote to see if the requested commit is the tip of any branch,
+        followed by the shallow fetch as before.
+    3.  A deep fetch of the provided branch
+    N.  Mirror everything
+    Then perform the operation locally.
+2.  As above, but inspecting the tree to guess a build-system
+    1.  If there is a local clone with that tree, do local operations
+    2.  If the git server is recent enough, can use `git archive --remote`,
+        this can fail if the commit isn't at the tip of any of the branches,
+        and uploadArchive.allowUnreachable hasn't been set to true.
+    3.  Fall back to sparse fetch procedure and do local operations
+3.  A faster git clone just for the specified commit,
+    plus enough history that `git describe` works,
+    given a repo url, a commit sha1 and a tree sha1.
+
+    1.  Add a smart fetch that can have the remote do the describe operation,
+        so the client can fetch just those commits.
+    2.  Repeatedly request shallow packs of all the commits for the
+        tags until it finds the target.
+    3.  Mirror all the tags.
+4.  The cache is too large and needs to be cleaned up.
+    Set mtimes on repositories so that unused ones can be removed.
+    If you can take an exclusive lock on a repository you can prune it.
+    If auto-gc config set, take exclusive lock and don't disable autogc?
+5.  There was a hard-crash and any state files may be wrong
+    1.  Any temporary anchor refs that aren't locked should be GC'd.
+        This should happen independently of the normal GC.
